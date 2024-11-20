@@ -42,16 +42,18 @@ int main()
     World world(Vector2f(0, 0));
     int score1(0);
     int score2(0);
-    int arrows(5);
 
 
 
     PhysicsRectangle paddle1;
-    Vector2f sz = paddle1.getSize();
-    paddle1.setCenter(Vector2f(30,
-        300 - (sz.y / 2)));
+    paddle1.setSize(Vector2f(10, 30));
+    paddle1.setCenter(Vector2f(30, 300));
+    world.AddPhysicsBody(paddle1);
 
-    
+    PhysicsCircle ball;
+    ball.setSize(Vector2f(50, 50));
+    ball.setCenter(Vector2f(400, 300));
+    world.AddPhysicsBody(ball);
 
     PhysicsRectangle top;
     top.setSize(Vector2f(800, 10));
@@ -70,13 +72,16 @@ int main()
     right.setCenter(Vector2f(795, 300));
     right.setStatic(true);
     world.AddPhysicsBody(right);
+    right.onCollision = [&ball](PhysicsBodyCollisionResult result) {
+        
+    };
 
-    
+
     PhysicsShapeList<PhysicsSprite> ducks;
 
 
 
-    
+
 
     Font fnt;
     if (!fnt.loadFromFile("arial.ttf")) {
@@ -87,9 +92,7 @@ int main()
     Time lastTime(clock.getElapsedTime());
     Time currentTime(lastTime);
     Time lastDuckTime(clock.getElapsedTime());
-
-
-    while ((arrows > 0)) {
+    while (score1 == 0) {
         currentTime = clock.getElapsedTime();
         Time deltaTime = currentTime - lastTime;
         long deltaMS = deltaTime.asMilliseconds();
@@ -99,8 +102,8 @@ int main()
             world.UpdatePhysics(deltaMS);
             MoveCrossbow(paddle1, deltaMS);
 
-            window.clear();
             
+
             Time duckDelta = currentTime - lastDuckTime;
             long duckMS = duckDelta.asMilliseconds();
             //if (duckMS > 2000) {
@@ -126,29 +129,25 @@ int main()
                         //ducks.QueueRemove(duck);
                     //}
                 //};
-            }
-            ducks.DoRemovals();
-
-
-
-            window.draw(paddle1);
-            for (PhysicsSprite& duck : ducks) {
-                window.draw(duck);
-            }
-            Text scoreText;
-            scoreText.setString(to_string(score1));
-            scoreText.setFont(fnt);
-            window.draw(scoreText);
-            Text arrowCountText;
-            arrowCountText.setString(to_string(arrows));
-            arrowCountText.setFont(fnt);
-            arrowCountText.setPosition(Vector2f(790 - GetTextSize(arrowCountText).x, 0));
-            window.draw(arrowCountText);
-            //world.VisualizeAllBounds(window);
-
-            window.display();
-
         }
+        ducks.DoRemovals();
+
+
+
+        window.draw(paddle1);
+        for (PhysicsSprite& duck : ducks) {
+            window.draw(duck);
+        }
+        Text scoreText;
+        scoreText.setString(to_string(score1));
+        scoreText.setFont(fnt);
+        window.draw(scoreText);
+        //world.VisualizeAllBounds(window);
+
+        window.display();
 
     }
+}
+
+   
 
